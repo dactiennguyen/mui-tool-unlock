@@ -1,0 +1,21 @@
+{
+    "title": "Multi Tool Unlocker",
+    "initializing": "Đang khởi tạo...",
+    "loading_components": "Đang tải các thành phần ứng dụng...",
+    "ready": "Sẵn sàng khởi chạy!",
+    "login_mui_account": "Login MUI Account",
+    "sign_in_subtitle": "Vui lòng đăng nhập để tiếp tục",
+    "link_subtitle": "Vui lòng nhập link để xác minh",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "link": "Link",
+    "email_placeholder": "Nhập địa chỉ email của bạn",
+    "password_placeholder": "Nhập mật khẩu của bạn",
+    "link_placeholder": "Nhập link để xác minh",
+    "login_mui": "Login Mui",
+    "verify_link": "Xác minh Link",
+    "back": "Quay lại",
+    "unlock_title": "MUI Tool Unlocker",
+    "waiting_to_connect": "Đang chờ kết nối điện thoại...",
+    "unlock": "Mở khoá"
+}

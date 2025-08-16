@@ -1,0 +1,21 @@
+{
+    "title": "Multi Tool Unlocker",
+    "initializing": "Initializing...",
+    "loading_components": "Loading application components...",
+    "ready": "Ready to launch!",
+    "login_mui_account": "Login MUI Account",
+    "sign_in_subtitle": "Please sign in to continue",
+    "link_subtitle": "Please enter the link to verify",
+    "email": "Email",
+    "password": "Password",
+    "link": "Link",
+    "email_placeholder": "Enter your email address",
+    "password_placeholder": "Enter your password",
+    "link_placeholder": "Enter the link to verify",
+    "login_mui": "Login Mui",
+    "verify_link": "Verify Link",
+    "back": "Back",
+    "unlock_title": "MUI Tool Unlocker",
+    "waiting_to_connect": "Waiting to connect phone...",
+    "unlock": "Unlock"
+  }

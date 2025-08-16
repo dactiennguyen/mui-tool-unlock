@@ -132,20 +132,13 @@ func printHelp() {
 }
 
 func setupPlatformTools() string {
-	// First try to find fastboot in system PATH
-	if path, err := exec.LookPath("fastboot"); err == nil {
-		fmt.Println("✅ Found fastboot in system PATH")
-		return path
-	}
+	// Always use local platform-tools, don't check system PATH
+	fmt.Println("📦 Setting up platform-tools...")
 
-	// If not found, try to download platform-tools
-	fmt.Println("📦 Fastboot not found in PATH, setting up platform-tools...")
-
-	execDir, err := os.Executable()
+	baseDir, err := os.Getwd()
 	if err != nil {
 		return ""
 	}
-	baseDir := filepath.Dir(execDir)
 	platformToolsDir := filepath.Join(baseDir, "platform-tools")
 
 	// Check if platform-tools already exists
@@ -428,11 +421,11 @@ func authenticateXiaomiReal(user, password, deviceID string) (*XiaomiAuthRespons
 }
 
 func loadUnlockData() *UnlockData {
-	homeDir, _ := os.UserHomeDir()
-	configDir := filepath.Join(homeDir, ".config", "miunlocktool")
-	os.MkdirAll(configDir, 0755)
-
-	dataFile := filepath.Join(configDir, "miunlockdata.json")
+	baseDir, err := os.Getwd()
+	if err != nil {
+		return &UnlockData{}
+	}
+	dataFile := filepath.Join(baseDir, "miunlockdata.json")
 
 	data := &UnlockData{}
 	if fileData, err := os.ReadFile(dataFile); err == nil {
@@ -443,9 +436,11 @@ func loadUnlockData() *UnlockData {
 }
 
 func saveUnlockData(data *UnlockData) {
-	homeDir, _ := os.UserHomeDir()
-	configDir := filepath.Join(homeDir, ".config", "miunlocktool")
-	dataFile := filepath.Join(configDir, "miunlockdata.json")
+	baseDir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	dataFile := filepath.Join(baseDir, "miunlockdata.json")
 
 	jsonData, _ := json.MarshalIndent(data, "", "  ")
 	os.WriteFile(dataFile, jsonData, 0644)

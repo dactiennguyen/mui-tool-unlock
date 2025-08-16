@@ -23,6 +23,7 @@ dist/
 bin/
 target/
 packages/
+platform-tools/
 
 # Application specific builds
 mui-tool-unlock

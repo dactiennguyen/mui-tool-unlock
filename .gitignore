@@ -1,0 +1,89 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Build directories and files
+build/
+dist/
+bin/
+target/
+packages/
+
+# Application specific builds
+mui-tool-unlock
+mui-tool-unlock.exe
+mui-tool-unlock-mac
+mui-tool-unlock-linux
+mui-tool-unlock-windows
+mui-tool-unlock-*
+mui-tool-unlock-terminal
+mui-tool-unlock-terminal.exe
+mui-tool-unlock-terminal-*
+
+# IDE and editor files
+.vscode/
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# MacOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux specific files
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Fyne specific files
+fyne-cross/
+*.app
+*.dmg
+*.pkg
+
+# Development tools
+.air.toml
+.goxc.json

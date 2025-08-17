@@ -9,14 +9,18 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"muitoolunlock/internal/colors"
 )
 
 // Setup sets up platform-tools and returns the fastboot path
 func Setup() string {
-	fmt.Println("📦 Setting up platform-tools...")
+	fmt.Println(colors.Section("🔧 Platform Tools Setup"))
+	fmt.Println(colors.Package("Setting up platform-tools..."))
 
 	baseDir, err := os.Getwd()
 	if err != nil {
+		fmt.Println(colors.Error("Failed to get current directory"))
 		return ""
 	}
 	platformToolsDir := filepath.Join(baseDir, "platform-tools")
@@ -31,7 +35,7 @@ func Setup() string {
 
 	fastbootPath := filepath.Join(platformToolsDir, fastbootName)
 	if _, err := os.Stat(fastbootPath); err == nil {
-		fmt.Println("✅ Platform-tools already available")
+		fmt.Println(colors.Success("Platform-tools already available"))
 		return fastbootPath
 	}
 
@@ -44,28 +48,31 @@ func Setup() string {
 	url := fmt.Sprintf("https://dl.google.com/android/repository/platform-tools-latest-%s.zip", osName)
 	zipPath := filepath.Join(baseDir, "platform-tools.zip")
 
-	fmt.Println("⬇️  Downloading platform-tools...")
+	fmt.Println(colors.Download("Downloading platform-tools..."))
+	fmt.Printf("%s %s\n", colors.Info("URL:"), colors.DimText(url))
 	if err := downloadFile(url, zipPath); err != nil {
-		fmt.Printf("❌ Failed to download platform-tools: %v\n", err)
+		fmt.Println(colors.Error(fmt.Sprintf("Failed to download platform-tools: %v", err)))
 		return ""
 	}
 
-	fmt.Println("📦 Extracting platform-tools...")
+	fmt.Println(colors.Package("Extracting platform-tools..."))
 	if err := unzipFile(zipPath, baseDir); err != nil {
-		fmt.Printf("❌ Failed to extract platform-tools: %v\n", err)
+		fmt.Println(colors.Error(fmt.Sprintf("Failed to extract platform-tools: %v", err)))
 		os.Remove(zipPath)
 		return ""
 	}
 
 	// Clean up zip file
 	os.Remove(zipPath)
+	fmt.Println(colors.Info("Cleaned up temporary files"))
 
 	// Make fastboot executable on Unix systems
 	if runtime.GOOS != "windows" {
 		os.Chmod(fastbootPath, 0755)
+		fmt.Println(colors.Info("Set executable permissions"))
 	}
 
-	fmt.Println("✅ Platform-tools setup completed")
+	fmt.Println(colors.Success("Platform-tools setup completed"))
 	return fastbootPath
 }
 

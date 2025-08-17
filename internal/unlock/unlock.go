@@ -9,49 +9,49 @@ import (
 	"strings"
 	"time"
 
+	"muitoolunlock/internal/colors"
 	"muitoolunlock/internal/device"
 	"muitoolunlock/internal/types"
 )
 
 // PerformUnlock performs the complete unlock process
 func PerformUnlock(deviceInfo *types.DeviceInfo, authData *types.XiaomiAuthResponse, fastbootPath string) {
-	fmt.Println("\n🔓 Starting unlock process...")
-	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println(colors.Header("🔓 Device Unlock Process"))
 
 	// Check if device is already unlocked
 	if deviceInfo.Unlocked == "yes" || deviceInfo.Unlocked == "true" {
-		fmt.Println("✅ Device is already unlocked!")
+		fmt.Println(colors.Success("Device is already unlocked!"))
 		return
 	}
 
 	// Step 1: Check device clear policy (like Python script)
-	fmt.Println("📋 Checking device unlock policy...")
+	fmt.Println(colors.Info("Checking device unlock policy..."))
 	clearPolicy := CheckDeviceClearPolicy(deviceInfo.Product)
 
 	if clearPolicy == 1 {
-		fmt.Println("⚠️  🔴 This device clears user data when it is unlocked")
+		fmt.Println(colors.Warning("🔴 This device clears user data when it is unlocked"))
 	} else if clearPolicy == -1 {
-		fmt.Println("✅ 🟢 Unlocking the device does not clear user data")
+		fmt.Println(colors.Success("🟢 Unlocking the device does not clear user data"))
 	}
 
-	fmt.Println("📢 Notice: Please ensure your device bootloader can be unlocked")
+	fmt.Println(colors.Notice("Please ensure your device bootloader can be unlocked"))
 
 	// Confirm before proceeding
-	fmt.Print("\n🔓 Press Enter to Unlock (or type 'q' to quit): ")
+	fmt.Print(colors.Prompt("\n🔓 Press Enter to Unlock (or type 'q' to quit): "))
 	reader := bufio.NewReader(os.Stdin)
 	choice, _ := reader.ReadString('\n')
 	if strings.TrimSpace(strings.ToLower(choice)) == "q" {
-		fmt.Println("❌ Unlock cancelled")
+		fmt.Println(colors.Error("Unlock cancelled"))
 		return
 	}
 
-	fmt.Println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println(colors.Section("🚀 Unlock Execution"))
 
 	// Step 2: Request unlock from Xiaomi API (like Python RetrieveEncryptData)
-	fmt.Print("⏳ Requesting unlock permission from Xiaomi servers")
+	fmt.Print(colors.Progress("Requesting unlock permission from Xiaomi servers"))
 	for i := 0; i < 5; i++ {
 		time.Sleep(500 * time.Millisecond)
-		fmt.Print(".")
+		fmt.Print(colors.DimText("."))
 	}
 	fmt.Println()
 
@@ -59,12 +59,12 @@ func PerformUnlock(deviceInfo *types.DeviceInfo, authData *types.XiaomiAuthRespo
 
 	if unlockResponse.Code == 0 && unlockResponse.EncryptData != "" {
 		// Success - got encrypted data
-		fmt.Println("📦 Received encrypted unlock data from Xiaomi")
+		fmt.Println(colors.Package("Received encrypted unlock data from Xiaomi"))
 
 		// Convert hex string to bytes (like Python script)
 		encryptedBytes, err := hex.DecodeString(unlockResponse.EncryptData)
 		if err != nil {
-			fmt.Printf("❌ Failed to decode encrypted data: %v\n", err)
+			fmt.Println(colors.Error(fmt.Sprintf("Failed to decode encrypted data: %v", err)))
 			return
 		}
 
@@ -72,26 +72,26 @@ func PerformUnlock(deviceInfo *types.DeviceInfo, authData *types.XiaomiAuthRespo
 		encryptFile := "encryptData"
 		err = os.WriteFile(encryptFile, encryptedBytes, 0644)
 		if err != nil {
-			fmt.Printf("❌ Failed to write encrypt data: %v\n", err)
+			fmt.Println(colors.Error(fmt.Sprintf("Failed to write encrypt data: %v", err)))
 			return
 		}
 
 		// Get serial number (like Python script)
-		fmt.Print("📋 Fetching device serial...")
+		fmt.Print(colors.Info("Fetching device serial..."))
 		device.RunFastbootCommand(fastbootPath, "getvar", "serialno")
 		fmt.Print("\r\033[K")
 
 		// Stage the encrypted data
-		fmt.Println("📤 Staging encrypted data...")
+		fmt.Println(colors.Upload("Staging encrypted data..."))
 		stageCmd := exec.Command(fastbootPath, "stage", encryptFile)
 		if err := stageCmd.Run(); err != nil {
-			fmt.Printf("❌ Failed to stage data: %v\n", err)
+			fmt.Println(colors.Error(fmt.Sprintf("Failed to stage data: %v", err)))
 			os.Remove(encryptFile)
 			return
 		}
 
 		// Perform unlock
-		fmt.Println("🔓 Executing unlock command...")
+		fmt.Println(colors.Unlock("Executing unlock command..."))
 		unlockCmd := exec.Command(fastbootPath, "oem", "unlock")
 		output, err := unlockCmd.CombinedOutput()
 
@@ -99,31 +99,31 @@ func PerformUnlock(deviceInfo *types.DeviceInfo, authData *types.XiaomiAuthRespo
 		os.Remove(encryptFile)
 
 		if err != nil {
-			fmt.Printf("❌ Unlock failed: %v\n", err)
-			fmt.Printf("Output: %s\n", string(output))
+			fmt.Println(colors.Error(fmt.Sprintf("Unlock failed: %v", err)))
+			fmt.Printf("%s %s\n", colors.Info("Output:"), colors.DimText(string(output)))
 			return
 		}
 
-		fmt.Println("✅ Device unlock successful!")
-		fmt.Println("🎉 Your Xiaomi device has been unlocked!")
+		fmt.Println(colors.Success("Device unlock successful!"))
+		fmt.Println(colors.Trophy("Your Xiaomi device has been unlocked!"))
 
 	} else if unlockResponse.DescEN != "" {
 		// Error from API
-		fmt.Printf("\n❌ Unlock request failed (Code: %d)\n", unlockResponse.Code)
-		fmt.Printf("📝 Message: %s\n", unlockResponse.DescEN)
+		fmt.Println(colors.Error(fmt.Sprintf("Unlock request failed (Code: %d)", unlockResponse.Code)))
+		fmt.Printf("%s %s\n", colors.Info("Message:"), colors.Warning(unlockResponse.DescEN))
 
 		if unlockResponse.Code == 20036 && unlockResponse.Data.WaitHour > 0 {
 			// Wait time required
 			waitTime := time.Now().Add(time.Duration(unlockResponse.Data.WaitHour) * time.Hour)
-			fmt.Printf("\n⏰ You can unlock on: %s\n", waitTime.Format("2006-01-02 15:04"))
+			fmt.Printf("\n%s %s\n", colors.Info("⏰ You can unlock on:"), colors.BoldText(waitTime.Format("2006-01-02 15:04")))
 		} else {
-			fmt.Println("\n💡 For error codes: https://offici5l.github.io/articles/mi-error-codes")
+			fmt.Printf("\n%s %s\n", colors.Info("💡 For error codes:"), colors.DimText("https://offici5l.github.io/articles/mi-error-codes"))
 		}
 	} else {
-		fmt.Printf("❌ Unexpected response from Xiaomi API: %+v\n", unlockResponse)
+		fmt.Println(colors.Error(fmt.Sprintf("Unexpected response from Xiaomi API: %+v", unlockResponse)))
 	}
 
-	fmt.Println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Println(colors.Section("🏁 Process Complete"))
 }
 
 // CheckDeviceClearPolicy checks if device clears data when unlocked
